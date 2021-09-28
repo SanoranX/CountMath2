@@ -10,48 +10,63 @@ def halfDivisionMethod(x3, x2, x1, k, a, b, eps):
     if halfDivisionMethod_check(x3, x2, x1, k, a, b):
         return 0
     x = 0
-    n = 0
+    iteration_count = 0
+    # Пока не достигнем нужной точности
     while abs(a - b) > eps:
         c = (a + b) / 2
-        n += 1
+        iteration_count += 1
         if f(a, x3, x2, x1, k) * f(c, x3, x2, x1, k) <= 0:
             b = c
         else:
             a = c
             x = (a + b) / 2
-    return 'Ответ: ' + str(x) + ' & f(x) = ' + str(f(x, x3, x2, x1, k)) + ' & Количество итераций: ' + str(n)
+    return 'Ответ: ' + str(x) + ' & f(x) = ' + str(f(x, x3, x2, x1, k)) + ' & Количество итераций: ' + str(iteration_count)
 
 
+# Проверка есть ли решения
 def halfDivisionMethod_check(x3, x2, x1, k, a, b):
     return f(a, x3, x2, x1, k) * f(b, x3, x2, x1, k) > 0
 
 
 # Решаем методом Ньютона
 def newtonMethod(x3, x2, x1, k, end, eps):
+
+    # Выбираем начальное приближение
+    # f(x0) * f''(x0) > 0
     if f(leftBorderApprox, x3, x2, x1, k) * f2(leftBorderApprox, x3, x2) > 0:
         end = leftBorderApprox
     else:
         end = rightBorderApprox
-    count = 0
+
+    # Подсчет итераций
+    iteration_count = 0
+
+    # Вычисляем по формуле используя начальное приближение
+    # Каждое следующее приближение корня рассчитывается на основании предшествующих данных
     tmp_1 = end
-    tmp = tmp_1
-    tmp_2 = tmp_1 - (f(tmp_1, x3, x2, x1, k) / f1(tmp_1, x3, x2, x1))
+    tmp = tmp_1 # Приближение 1
+    tmp_2 = tmp_1 - (f(tmp_1, x3, x2, x1, k) / f1(tmp_1, x3, x2, x1)) # x(iteration_count + 1) = f(xn) / f'(xn)
+
+    # Продолжаем итерации, пока не достигнем заданной точности
+    # Смотреть отчет с формулами, тут красиво не выйдет
     while abs(tmp - tmp_2) > eps:
-        count += 1
+        # Добавляем 1 к итерациям
+        iteration_count += 1
         tmp = tmp_1
         tmp_1 = tmp_2
+        # Расчитываем приближение
         tmp_2 = tmp - (f(tmp, x3, x2, x1, k) / f1(tmp, x3, x2, x1))
-    return 'Ответ: ' + str(tmp) + ' & f(x) = ' + str(f(tmp, x3, x2, x1, k)) + ' & Количество итераций: ' + str(count)
+    return 'Ответ: ' + str(tmp) + ' & f(x) = ' + str(f(tmp, x3, x2, x1, k)) + ' & Количество итераций: ' + str(iteration_count)
 
 
 # Решение способом простой итерации
 def simpleIterationMethod(x3, x2, x1, k, a, b, eps):
     if simpleIterationMethod_check(a, b, k):
         return 0
-    MIN_RANGE = a
-    MAX_RANGE = b
+    MIN_RANGE = a # Левая граница приближения
+    MAX_RANGE = b # Правая граница приближения
     x = b
-    count = 0
+    iteration_count = 0
     x = searchX(MIN_RANGE, MAX_RANGE, x, x3, x2, x1)
     lambd = getLambda(x, x3, x2, x1)
     x0 = x
@@ -59,24 +74,29 @@ def simpleIterationMethod(x3, x2, x1, k, a, b, eps):
     while abs(x - x0) >= eps:
         x0 = x
         x = x - lambd * (f(x, x3, x2, x1, k))
-        count += 1
-    return 'Ответ: ' + str(x0) + ' & f(x) = ' + str(f(x0, x3, x2, x1, k)) + ' & Количество итераций: ' + str(count)
+        iteration_count += 1
+    return 'Ответ: ' + str(x0) + ' & f(x) = ' + str(f(x0, x3, x2, x1, k)) + ' & Количество итераций: ' + str(iteration_count)
 
 
+# Проверяем условие сходимости
 def simpleIterationMethod_check(a, b, k):
     count_1 = 1 / (3 * pow(abs(a - k), -2 / 3)) if (a - k > 0) else 0
     count_2 = 1 / (3 * pow(abs(b - k), -2 / 3)) if (b - k > 0) else 0
     return count_1 >= 1 and count_2 >= 1
 
 
+# Обычная f(x) функция
 def f(x, x3, x2, x1, k):
     return x3 * pow(x, 3) + x2 * pow(x, 2) + x1 * x + k
 
 
+# Первая производная
 def f1(x, x3, x2, x1):
     return 3 * x3 * pow(x, 2) + 2 * x2 * x + x1
 
 
+# Вторая производная
+# См. производные
 def f2(x, x3, x2):
     return 6 * x3 * x + 2 * x2
 
@@ -119,7 +139,7 @@ if __name__ == '__main__':
     print("Добро пожаловать! Следуйте, пожалуйста, инструкциям.")
     while isEnteringManually:
         print('[MENU]\n[1] - Для того, чтобы открыть из файла\n[2] - Для того, чтобы написать вручную')
-        mes = raw_input()
+        mes = input()
         if mes == "1":
             try:
                 inputDocumentPath = open('input', 'r')
@@ -154,7 +174,7 @@ if __name__ == '__main__':
     answer = ''
 
     while isAnswered:
-        give = raw_input()
+        give = input()
         if give == '1':
             printGraph(leftBorderApprox, rightBorderApprox)
             answer = halfDivisionMethod(indexX3, indexX2, indexX1, indexK, leftBorderApprox, rightBorderApprox, epsilon)
